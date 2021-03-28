@@ -22,6 +22,7 @@ const Signin = (props) => {
 
     const { form, section, errorTextStyle } = styles;
 
+    
     function signinUser(email, password) {
         const API_URL = SERVER_URL + '/signin';
         return fetch(API_URL, {
@@ -34,6 +35,7 @@ const Signin = (props) => {
         })
         .then(data => data.json());
     }
+    
 
     function signin() {
         setError('');
@@ -45,7 +47,8 @@ const Signin = (props) => {
                 onSigninFail('Incorrect email or password');
             } else {
                 deviceStorage.saveItem("token", response.token);
-                props.newJwt(response.token);
+                // props.newJwt(response.token);
+                props.navigation.navigate('App');
             }
         })
         .catch(err => {

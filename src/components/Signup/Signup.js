@@ -54,7 +54,8 @@ const Signup = (props) => {
                 console.log(response);
             } else {
                 deviceStorage.saveItem("token", response.token);
-                props.newJwt(response.token);
+                // props.newJwt(response.token);
+                props.navigation.navigate('App');
             }
         })
         .catch(error => {

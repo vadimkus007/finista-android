@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { Signin, Signup } from '../../components';
 
 
-const Auth = (props) => {
+const AuthScreen = (props) => {
 
     const [showLogin, setShowLogin] = useState(true);
 
@@ -20,13 +20,17 @@ const Auth = (props) => {
         }
     };
 
+    const switchScreen = () => {
+        props.navigation.navigate(showLogin ? 'Signin' : 'Signup');
+    }
+
     const authSwitch = () => {
         setShowLogin(!showLogin);
     };
 
     return (
         <View style={styles.container} >
-            { witchForm() }
+            { witchForm }
         </View>
     );
 
@@ -40,4 +44,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export { Auth };
+export { AuthScreen };
