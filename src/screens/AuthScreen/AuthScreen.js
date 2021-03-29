@@ -30,10 +30,14 @@ const AuthScreen = (props) => {
 
     return (
         <View style={styles.container} >
-            { witchForm }
+            { witchForm() }
         </View>
     );
 
+};
+
+AuthScreen.navigationOptions = {
+    header: null
 };
 
 const styles = StyleSheet.create({

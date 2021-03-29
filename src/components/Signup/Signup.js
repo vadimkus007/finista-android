@@ -69,7 +69,7 @@ const Signup = (props) => {
     }
 
     return (
-        <Fragment>
+        <View style={ styles.container } >
         <View style={form}>
             <View style={ section } >
                 <Input 
@@ -122,14 +122,19 @@ const Signup = (props) => {
              }
         </View>
 
-        <TextLink onPress={ props.authSwitch }>
+        <TextLink onPress={ () => props.navigation.navigate('Signin') }>
             Already have an account? Signin!
         </TextLink>
-        </Fragment>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     form: {
         width: '100%',
         borderTopWidth: 1,

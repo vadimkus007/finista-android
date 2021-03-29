@@ -12,11 +12,12 @@ import { AuthScreen } from './screens';
 import { HomeScreen } from './screens';
 import { AuthLoadingScreen } from './screens';
 import { Signin, Signup } from './components';
+import { TabScreen } from './screens';
 
 import deviceStorage from './services/deviceStorage';
 
-const AppStack = createStackNavigator({ Home: HomeScreen });
-const AuthStack = createStackNavigator({ AuthScreen: AuthScreen, Signin: Signin, Signup: Signup });
+const AppStack = createStackNavigator({ TabScreen });
+const AuthStack = createStackNavigator({ Signin: Signin, Signup: Signup });
 
 export default createAppContainer(
     createSwitchNavigator(

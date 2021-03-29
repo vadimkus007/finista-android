@@ -62,9 +62,9 @@ const Signin = (props) => {
     }
 
     return (
-        <Fragment>
-        <View style={form}>
-            <View style={ section } >
+        <View style={ styles.container } >
+        <View style={ styles.form }>
+            <View style={ styles.section } >
                 <Input 
                     placeholder="E-mail"
                     label="Email"
@@ -73,7 +73,7 @@ const Signin = (props) => {
                 />
             </View>
 
-            <View style={ section } >
+            <View style={ styles.section } >
                 <Input 
                     secureTextEntry
                     placeholder="password"
@@ -83,7 +83,7 @@ const Signin = (props) => {
                 />
             </View>
 
-            <Text style={ errorTextStyle }>
+            <Text style={ styles.errorTextStyle }>
                 { error }
             </Text>
 
@@ -97,14 +97,19 @@ const Signin = (props) => {
              }
         </View>
 
-        <TextLink onPress={ props.authSwitch }>
+        <TextLink onPress={ () => props.navigation.navigate('Signup') }>
             Don't have an account? Register!
         </TextLink>
-        </Fragment>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     form: {
         width: '100%',
         borderTopWidth: 1,
