@@ -9,14 +9,21 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { Button } from './components/common';
 
 import { AuthScreen } from './screens';
-import { HomeScreen } from './screens';
+// import { HomeScreen } from './screens';
 import { AuthLoadingScreen } from './screens';
 import { Signin, Signup } from './components';
 import { TabScreen } from './screens';
 
 import deviceStorage from './services/deviceStorage';
 
-const AppStack = createStackNavigator({ TabScreen });
+const AppStack = createStackNavigator({ 
+    TabScreen:{
+        screen: TabScreen,
+        navigationOptions: {
+            headerShown: false
+        }
+    },
+});
 const AuthStack = createStackNavigator({ Signin: Signin, Signup: Signup });
 
 export default createAppContainer(
@@ -31,40 +38,3 @@ export default createAppContainer(
         }
     )
 );
-
-/*
-export default function App() {
-
-    const [jwt, setJwt] = useState('');
-
-    const newJwt = (jwt) => {
-        setJwt(jwt);
-    };
-
-    const loadJWT = () => {
-        const value = deviceStorage.loadJWT();
-        setJwt(value);
-    };
-
-
-    const logout = () => {
-        deviceStorage.deleteJWT();
-        setJwt('');
-    };
-
-    useEffect(() => {
-        loadJWT();
-    }, []);
-
-    if (!jwt) {
-        return (
-            <AuthScreen newJwt={newJwt} />
-        );
-    } else {
-        return (
-            <HomeScreen logout={logout} />
-        );
-    }
-      
-};
-*/
