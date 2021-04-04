@@ -26,7 +26,7 @@ const DashboardStack = createStackNavigator({
     Dashboard: {
         screen: DashboardScreen,
         navigationOptions: ({ navigation }) => ({
-            title: 'Dashboard'
+            title: 'Избранное'
         })
     }
 },
