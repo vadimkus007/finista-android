@@ -4,7 +4,11 @@ const deviceStorage = {
 
     async saveItem(key, value) {
         try {
-            await AsyncStorage.setItem(key, value);
+            let val = value;
+            if (typeof(val) === 'object') {
+                val = JSON.stringify(val);
+            }
+            await AsyncStorage.setItem(key, val);
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
         }
@@ -27,6 +31,19 @@ const deviceStorage = {
     async deleteJWT(key = 'token') {
         try {
             await AsyncStorage.removeItem(key);
+        } catch (error) {
+            console.log('AsyncStorage Error: ' + error.message);
+        }
+    },
+
+    async loadItem(key) {
+        try {
+            const value = await AsyncStorage.getItem(key);
+            if (value !== null) {
+                return JSON.parse(value);
+            } else {
+                return '';
+            }
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
         }

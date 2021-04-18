@@ -59,7 +59,7 @@ const PortfoliosStack = createStackNavigator({
     Portfolios: {
         screen: PortfoliosScreen,
         navigationOptions: ({ navigation }) => ({
-            title: 'Portfolios'
+            title: 'Выбор портфеля'
         })
     }
 },
