@@ -19,7 +19,7 @@ const PortfoliosScreen = (props) => {
     const [portfolios, setPortfolios] = useState([]);
 
     const handleAddPortfolio = () => {
-        console.log('Add portfolio button pressed');
+        props.navigation.navigate('PortfolioEdit');
     };
 
     const selectPortfolio = async (portfolio) => {
@@ -33,6 +33,7 @@ const PortfoliosScreen = (props) => {
         if (portfolio) {
             await deviceStorage.saveItem('portfolio', portfolio);
         }
+        props.navigation.navigate('PortfolioEdit', {portfolio: portfolio});
         console.log(`Edit portfolio ${portfolio.id}`);
     };
 
@@ -47,9 +48,14 @@ const PortfoliosScreen = (props) => {
         });
     };
 
+    const clearPortfolio = async () => {
+        await deviceStorage.deleteItem('portfolio');
+    };
+
     useEffect(() => {
         setLoading(true);
         _loadData();
+        clearPortfolio();
         setLoading(false);
     }, []);
 

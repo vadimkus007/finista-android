@@ -47,6 +47,14 @@ const deviceStorage = {
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
         }
+    },
+
+    async deleteItem(key) {
+        try {
+            await AsyncStorage.removeItem(key);
+        } catch (error) {
+            console.log('AsyncStorage Error: ' + error.message);
+        }
     }
 
 };

@@ -11,6 +11,7 @@ import { DashboardScreen } from '../../screens/DashboardScreen';
 import { QuotesScreen } from '../../screens/QuotesScreen';
 import { PortfoliosScreen } from '../../screens/PortfoliosScreen';
 import { CalendarScreen } from '../../screens/CalendarScreen';
+import { PortfolioEditScreen } from '../../screens/PortfolioEditScreen';
 
 const SignoutScreen = () => {};
 
@@ -61,6 +62,12 @@ const PortfoliosStack = createStackNavigator({
         navigationOptions: ({ navigation }) => ({
             title: 'Выбор портфеля'
         })
+    },
+    PortfolioEdit: {
+        screen: PortfolioEditScreen,
+        navigationOptions: ({ navigation }) => ({
+            title: 'Изменить портфель'
+        })
     }
 },
 {
@@ -104,6 +111,7 @@ export const TabScreen = createBottomTabNavigator({
             ),
             tabBarOnPress: ({ navigation }) => {
                 deviceStorage.deleteJWT();
+                deviceStorage.deleteJWT('user');
                 navigation.navigate('Auth');
             },
         }

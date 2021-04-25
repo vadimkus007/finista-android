@@ -47,6 +47,7 @@ const Signin = (props) => {
                 onSigninFail('Incorrect email or password');
             } else {
                 deviceStorage.saveItem("token", response.token);
+                deviceStorage.saveItem("user", response.user);
                 // props.newJwt(response.token);
                 props.navigation.navigate('App');
             }

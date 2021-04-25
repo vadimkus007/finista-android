@@ -54,6 +54,7 @@ const Signup = (props) => {
                 console.log(response);
             } else {
                 deviceStorage.saveItem("token", response.token);
+                deviceStorage.seveItem("user", response.user);
                 // props.newJwt(response.token);
                 props.navigation.navigate('App');
             }

@@ -6,3 +6,4 @@ export * from './DashboardScreen';
 export * from './QuotesScreen';
 export * from './PortfoliosScreen';
 export * from './CalendarScreen';
+export * from './PortfolioEditScreen';
