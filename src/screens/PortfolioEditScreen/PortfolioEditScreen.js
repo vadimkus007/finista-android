@@ -6,10 +6,19 @@ import { StatusBar } from 'expo-status-bar';
 import {
     Input,
     Button,
-    TextInput
+    TextInput,
+    Loading
 } from '../../components/common';
 
+import DatePicker from 'react-native-datepicker';
+
+import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
+
+import { Entypo as Icon } from '@expo/vector-icons';
+
 import deviceStorage from '../../services/deviceStorage';
+
+import { postRequest } from '../../helpers';
 
 const defaultPortfolio = {
     title: 'Default Portfolio',
@@ -24,6 +33,8 @@ const PortfolioEditScreen = (props) => {
 
     const [user, setUser] = useState({});
     const [portfolio, setPortfolio] = useState(defaultPortfolio);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const passedParam = props.navigation.getParam('portfolio', defaultPortfolio);
 
@@ -48,6 +59,29 @@ const PortfolioEditScreen = (props) => {
         // console.log(portfolio);
     }, [portfolio]);
 
+    function handleSubmit() {
+        const endPoint = '/portfolios/save';
+        postRequest(endPoint, portfolio)
+        .then(result => {
+            if (result.portfolio) {
+                console.log('Portfolio saved', result.portfolio);
+                props.navigation.state.params.refresh();
+                props.navigation.navigate('Portfolios');
+                return;
+            }
+            if (result.message) {
+                console.log('Portfolio saved with message', result.message);
+                props.navigation.state.params.refresh();
+                props.navigation.navigate('Portfolios');
+                return;
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+        // alert(JSON.stringify(portfolio, null, 2));
+    };
+
     return (
         <View style={styles.container}>
             <View style={ styles.form }>
@@ -60,12 +94,20 @@ const PortfolioEditScreen = (props) => {
                     />
                 </View>
                 <View style={ styles.section }>
-                    <TextInput 
-                        placeholder="Валюта"
-                        label="Валюта"
-                        value={ portfolio.currency }
-                        onChangeText = { (currency) => {setPortfolio({...portfolio, currency: currency})} }
-                    />
+                        <Dropdown 
+                            label='Валюта портфеля'
+                            containerStyle={{flex: 1, }}
+                            pickerStyle={{borderBottomColor:'transparent',borderWidth: 0}}
+                            data={ [
+                                {value: 'RUB'},
+                                {value: 'USD'},
+                                {value: 'EUR'},
+                                {value: 'GBP'}
+                            ] }
+                            value={ portfolio.currency }
+                            useNativeDriver={true}
+                            onChangeText={ (currency) => { setPortfolio({...portfolio, currency: currency}) }}
+                        />    
                 </View>
                 <View style={ styles.section }>
                     <TextInput 
@@ -76,11 +118,28 @@ const PortfolioEditScreen = (props) => {
                     />
                 </View>
                 <View style={ styles.section }>
-                    <TextInput 
-                        placeholder="Дата открытия"
-                        label="Дата открытия"
-                        value={ portfolio.dateopen.slice(0,10) }
-                        onChangeText = { (date) => {setPortfolio({...portfolio, dateopen: date})} }
+                    <Text style={{fontSize: 16}}>Дата открытия</Text>
+                    <DatePicker
+                        date={ portfolio.dateopen }
+                        mode="date"
+                        placeholder="Select date"
+                        format="YYYY-MM-DD"
+                        confirmBtnText="OK"
+                        cancelBtnText="Отмена"
+                        customStyles={{
+                            dateIcon: {
+                                position: 'absolute',
+                                left: 0,
+                                top: 4,
+                                marginLeft: 0
+                            },
+                            dateInput: {
+                                marginLeft: 36,
+                                borderRadius: 8,
+                            }
+                        }}
+                        onDateChange={ (date) => {setPortfolio({...portfolio, dateopen: date})} }
+                        useNativeDriver={true}
                     />
                 </View>
                 <View style={ styles.section }>
@@ -89,18 +148,16 @@ const PortfolioEditScreen = (props) => {
                         label="Описание"
                         value={ portfolio.memo }
                         onChangeText={ (memo) => {setPortfolio({...portfolio, memo: memo})} }
-                        multiline={true}
-                        numberOfLines={2}
                     />
                 </View>
 
-                <View style={ styles.section }>
-                    <Text>{ portfolio.title }</Text>
-                </View>
-
-                <Button onPress={()=>{}}>
+                { !loading ?
+                <Button onPress={ handleSubmit }>
                     Сохранить
                 </Button>
+                : 
+                <Loading size={'large'} />
+                }
 
             </View>
             <StatusBar style="auto" />
@@ -116,6 +173,7 @@ PortfolioEditScreen.navigationOptions = {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'column',
         backgroundColor: '#fff',
         alignItems: 'flex-start',
     },
@@ -127,7 +185,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0,
         backgroundColor: '#fff',
         borderColor: '#ddd',
-        padding: 8
+        padding: 8,
+        alignItems: 'flex-start'
     },
 });
 

@@ -19,7 +19,7 @@ const PortfoliosScreen = (props) => {
     const [portfolios, setPortfolios] = useState([]);
 
     const handleAddPortfolio = () => {
-        props.navigation.navigate('PortfolioEdit');
+        props.navigation.navigate('PortfolioEdit', {refresh: refreshData});
     };
 
     const selectPortfolio = async (portfolio) => {
@@ -33,8 +33,7 @@ const PortfoliosScreen = (props) => {
         if (portfolio) {
             await deviceStorage.saveItem('portfolio', portfolio);
         }
-        props.navigation.navigate('PortfolioEdit', {portfolio: portfolio});
-        console.log(`Edit portfolio ${portfolio.id}`);
+        props.navigation.navigate('PortfolioEdit', {portfolio: portfolio, refresh: refreshData});
     };
 
     const _loadData = () => {
@@ -50,6 +49,10 @@ const PortfoliosScreen = (props) => {
 
     const clearPortfolio = async () => {
         await deviceStorage.deleteItem('portfolio');
+    };
+
+    const refreshData = () => {
+        _loadData();
     };
 
     useEffect(() => {
