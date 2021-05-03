@@ -25,7 +25,8 @@ const PortfoliosScreen = (props) => {
     const selectPortfolio = async (portfolio) => {
         if (portfolio) {
             await deviceStorage.saveItem('portfolio', portfolio);
-        }
+        };
+        props.navigation.navigate('PortfolioStack', {portfolio: portfolio});
         console.log(`Portfolio selected ${portfolio.title}`);
     };
 

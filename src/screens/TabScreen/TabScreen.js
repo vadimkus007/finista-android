@@ -13,6 +13,8 @@ import { PortfoliosScreen } from '../../screens/PortfoliosScreen';
 import { CalendarScreen } from '../../screens/CalendarScreen';
 import { PortfolioEditScreen } from '../../screens/PortfolioEditScreen';
 
+import { PortfolioStack } from '../../screens/PortfolioStack';
+
 const SignoutScreen = () => {};
 
 const style = StyleSheet.create({
@@ -22,6 +24,7 @@ const style = StyleSheet.create({
         alignItems: 'center'
     }
 });
+
 
 const DashboardStack = createStackNavigator({ 
     Dashboard: {
@@ -68,6 +71,15 @@ const PortfoliosStack = createStackNavigator({
         navigationOptions: ({ navigation }) => ({
             title: 'Изменить портфель'
         })
+    },
+    PortfolioStack: {
+        screen: PortfolioStack,
+        navigationOptions: ({navigation}) => {
+            let portfolio = navigation.getParam('portfolio');
+            return {
+                title: portfolio.title
+            }
+        }
     }
 },
 {
