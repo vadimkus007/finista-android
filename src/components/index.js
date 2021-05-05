@@ -3,3 +3,4 @@ export * from './Signup';
 export * from './DashboardCard';
 export * from './AddPortfolioCard';
 export * from './PortfolioCard';
+export * from './PortfolioHeader';
