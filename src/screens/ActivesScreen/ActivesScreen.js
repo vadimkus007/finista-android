@@ -8,7 +8,8 @@ import { Loading } from '../../components/common';
 
 import { getRequest } from '../../helpers';
 
-import { PortfolioHeader } from '../../components'
+import { PortfolioHeader } from '../../components';
+import { ExpandableTable as Table } from '../../components';
 
 const ActivesScreen = (props) => {
 
@@ -49,50 +50,85 @@ const ActivesScreen = (props) => {
         });
     };
 
+    const getColor = (value) => {
+        if (value > 0) {
+            return 'green';
+        } else if (value < 0) {
+            return 'red';
+        }
+    }
+
+    const activesTable = (actives) => {
+        return (
+            <Table>
+                {actives.map(item => (
+                    <Table.Row>
+                        <Table.Cell textColor={getColor(item.changePrc)}>
+                            { item.SHORTNAME + ' (' + item.changePrc + ' %)' }
+                        </Table.Cell>
+                        <Table.Cell numeric>{ Number(item.last).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric textColor={getColor(item.profit)}>{ Number(item.profit).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>{ Number(item.percentage).toFixed(2) }</Table.Cell>
+                    </Table.Row>
+                ))}
+            </Table>
+        );
+    }
+
     return (
         <ScrollView contentContainerStyle={ styles.container } >
             { !loading ?
                 <>
                 <PortfolioHeader portfolio={ portfolio } />
-                
-                <DataTable>
-                    <DataTable.Header style={{backgroundColor: '#f1f8ff'}}>
-                        <DataTable.Title>Актив</DataTable.Title>
-                        <DataTable.Title numeric>Стоимость</DataTable.Title>
-                        <DataTable.Title numeric>Прибыль</DataTable.Title>
-                        <DataTable.Title numeric>Доля</DataTable.Title>
-                    </DataTable.Header>
+
+                <Table style={{ marginTop: 10 }} >
+                    <Table.Header style={{ backgroundColor: '#f1f8ff' }}>
+                        <Table.Title>
+                            <Text style={ styles.title }>Актив</Text>
+                        </Table.Title>
+                        <Table.Title numeric>
+                            <Text style={ styles.title }>Стоимость</Text>
+                        </Table.Title>
+                        <Table.Title numeric>
+                            <Text style={ styles.title }>Прибыль</Text>
+                        </Table.Title>
+                        <Table.Title numeric>
+                            <Text style={ styles.title }>Доля</Text>
+                        </Table.Title>
+                    </Table.Header>
+
                     { (portfolio.shares && portfolio.shares.cost > 0) && (
-                        <DataTable.Row>
-                            <DataTable.Cell>Акции</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.shares.cost).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.shares.profit).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.shares.percentage).toFixed(2) }</DataTable.Cell>
-                        </DataTable.Row>
+                    <Table.Row expandable data={ activesTable(shares) } style={{backgroundColor: '#f6f6f6'}}>
+                        <Table.Cell>Акции</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.shares.cost).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric textColor={getColor(portfolio.shares.profit)}>{ Number(portfolio.shares.profit).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.shares.percentage).toFixed(2) }</Table.Cell>
+                    </Table.Row>
                     )}
                     { (portfolio.etf && portfolio.etf.cost > 0) && (
-                        <DataTable.Row>
-                            <DataTable.Cell>ETF/ПИФ</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.etf.cost).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.etf.profit).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.etf.percentage).toFixed(2) }</DataTable.Cell>
-                        </DataTable.Row>
-                    )}
+                    <Table.Row expandable data={ activesTable(etf) } style={{backgroundColor: '#f6f6f6'}}>
+                        <Table.Cell>ETF/ПИФ</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.etf.cost).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric textColor={getColor(portfolio.etf.profit)}>{ Number(portfolio.etf.profit).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.etf.percentage).toFixed(2) }</Table.Cell>
+                    </Table.Row>
+                    ) }
                     { (portfolio.bonds && portfolio.bonds.cost > 0) && (
-                        <DataTable.Row>
-                            <DataTable.Cell>Облигации</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.bonds.cost).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.bonds.profit).toFixed(2) }</DataTable.Cell>
-                            <DataTable.Cell numeric>{ Number(portfolio.bonds.percentage).toFixed(2) }</DataTable.Cell>
-                        </DataTable.Row>
-                    )}
-                    <DataTable.Row>
-                        <DataTable.Cell>Рубли</DataTable.Cell>
-                        <DataTable.Cell numeric>{ Number(portfolio.cashe).toFixed(2) }</DataTable.Cell>
-                        <DataTable.Cell numeric>-</DataTable.Cell>
-                        <DataTable.Cell numeric>{ Number(portfolio.cashePercentage).toFixed(2) }</DataTable.Cell>
-                    </DataTable.Row>
-                </DataTable>
+                    <Table.Row expandable data={ activesTable(bands) } style={{backgroundColor: '#f6f6f6'}}>
+                        <Table.Cell>Облигации</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.bonds.cost).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric textColor={getColor(portfolio.bonds.profit)}>{ Number(portfolio.bonds.profit).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.bonds.percentage).toFixed(2) }</Table.Cell>
+                    </Table.Row>
+                    ) }
+                    <Table.Row style={{backgroundColor: '#f6f6f6'}}>
+                        <Table.Cell>Рубли</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.cashe).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>-</Table.Cell>
+                        <Table.Cell numeric>{ Number(portfolio.cashePercentage).toFixed(2) }</Table.Cell>
+                    </Table.Row>
+
+                </Table>
 
                 </>
                 :
@@ -114,6 +150,9 @@ const styles = StyleSheet.create({
   table: {
     width: '100%',
   },
+  title: {
+    fontWeight: '700',
+  }
 });
 
 export { ActivesScreen };

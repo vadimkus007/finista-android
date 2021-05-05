@@ -4,3 +4,4 @@ export * from './DashboardCard';
 export * from './AddPortfolioCard';
 export * from './PortfolioCard';
 export * from './PortfolioHeader';
+export * from './ExpandableTable';
