@@ -14,6 +14,8 @@ import DatePicker from 'react-native-datepicker';
 
 import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
 
+import { Picker } from '@react-native-picker/picker';
+
 import { Entypo as Icon } from '@expo/vector-icons';
 
 import deviceStorage from '../../services/deviceStorage';
@@ -93,21 +95,20 @@ const PortfolioEditScreen = (props) => {
                         onChangeText = { (title) => {setPortfolio({...portfolio, title: title})} }
                     />
                 </View>
-                <View style={ styles.section }>
-                        <Dropdown 
-                            label='Валюта портфеля'
-                            containerStyle={{flex: 1, }}
-                            pickerStyle={{borderBottomColor:'transparent',borderWidth: 0}}
-                            data={ [
-                                {value: 'RUB'},
-                                {value: 'USD'},
-                                {value: 'EUR'},
-                                {value: 'GBP'}
-                            ] }
-                            value={ portfolio.currency }
-                            useNativeDriver={true}
-                            onChangeText={ (currency) => { setPortfolio({...portfolio, currency: currency}) }}
-                        />    
+                <View style={ [styles.section, {flexDirection: 'column', }] }>
+                    <Text style={{ fontSize: 16 }}>Валюта портфеля</Text>
+                    <View style={ styles.pickerContainer }>
+                        <Picker 
+                            selectedValue={ portfolio.currency }
+                            onValueChange = { (itemValue, itemIndex) => { setPortfolio({...portfolio, currency: itemValue}) }  }
+                            style={{ flex: 1, height: 32, borderBottomColor: 'transparent', borderWidth: 0 }}
+                        >
+                            <Picker.Item label='Рубли' value='RUB'/>
+                            <Picker.Item label='USD' value='USD'/>
+                            <Picker.Item label='EUR' value='EUR'/>
+                            <Picker.Item label='GBP' value='GBP'/>
+                        </Picker>
+                    </View>
                 </View>
                 <View style={ styles.section }>
                     <TextInput 
@@ -187,6 +188,17 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         padding: 8,
         alignItems: 'flex-start'
+    },
+    pickerContainer: {
+        width: '100%',
+        minHeight: 36,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 10,
+    },
+    picker: {
+        width: '100%',
+
     },
 });
 

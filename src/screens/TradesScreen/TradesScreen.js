@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
 
@@ -13,6 +13,8 @@ import { getRequest } from '../../helpers';
 
 import { Menu, MenuProvider, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
+import { RadioButton } from '../../components';
+
 
 const TradesScreen = (props) => {
 
@@ -20,7 +22,8 @@ const TradesScreen = (props) => {
     const [portfolio, setPortfolio] = useState({});
     const [trades, setTrades] = useState([]);
     const [sorted, setSorted] = useState('date');
-    const [order, setPrder] = useState('ASC');
+    const [order, setOrder] = useState('ASC');
+    const [filter, setFilter] = useState('all');
 
     useEffect(() => {
         let _portfolio = props.navigation.getParam('portfolio');
@@ -55,18 +58,26 @@ const TradesScreen = (props) => {
     const sortTrades = (key, order = 'ASC') => {
         let _trades = trades;
         _trades.sort((a, b) => {
+            /*
             if (order.toUpperCase() === 'ASC') {
-                if (typeof a[key] === 'string') {
-                    return b[key].localeCompare(a[key]);
-                } else {
-                    return b[key] - a[key];
-                }
-            } else {
                 if (typeof a[key] === 'string') {
                     return a[key].localeCompare(b[key]);
                 } else {
                     return a[key] - b[key];
                 }
+            } else {
+                if (typeof b[key] === 'string') {
+                    return b[key].localeCompare(a[key]);
+                } else {
+                    return b[key] - a[key];
+                }
+            }
+            */
+            if (order.toUpperCase() === 'ASC') {
+                return a[key].localeCompare(b[key]);
+            } 
+            if (order.toUpperCase() === 'DESC') {
+                return b[key].localeCompare(a[key]);
             }
             return 0;
         });
@@ -75,7 +86,23 @@ const TradesScreen = (props) => {
 
     const handleMenuSelect = (value) => {
         const {action, trade} = value;
-        console.log(action, trade);
+        switch (action) {
+            case 'edit': 
+                console.log('Edit', value);
+                break;
+            case 'delete':
+                Alert.alert(
+                    'ВНИМАНИЕ',
+                    'Вы действительно хотите удалить сделку?',
+                    [
+                        {text: 'Да', onPress: () => {console.log('Delete')}},
+                        {text: 'Нет'}
+                    ]
+                );
+                break;
+            default:
+                break;
+        };
     };
 
     const renderRow = (trade) => {
@@ -87,13 +114,13 @@ const TradesScreen = (props) => {
             const etfGroup = ['ETF', 'ПИФ'];
             const bondsGroup = ['Облигация'];
             if (sharesGroup.includes(group)) {
-                return 'alpha-s-circle';
+                return 'book-multiple';
             } else if (etfGroup.includes(group)) {
-                return 'alpha-e-circle';
+                return 'newspaper';
             } else if (bondsGroup.includes(group)) {
-                return 'alpha-b-circle';
+                return 'bell-ring';
             } else {
-                return 'alpha-c-circle';
+                return 'cash-100';
             }
         };
 
@@ -121,7 +148,7 @@ const TradesScreen = (props) => {
                         <MenuTrigger>
                             <Icon name='dots-vertical' color='black' size={18} />
                         </MenuTrigger>
-                        <MenuOptions optionsContainerStyle={{ marginTop: -200 }}>
+                        <MenuOptions optionsContainerStyle={{ marginTop: -200, }}>
                             <MenuOption value={{action: 'edit', trade: trade}}>
                                 <Text>Редактировать</Text>
                             </MenuOption>
@@ -149,10 +176,51 @@ const TradesScreen = (props) => {
 
     var currentSelector = null;
 
+    const radioItems = [
+        {
+            label: <Text style={ {color: 'blue'} }>Все</Text>,
+            value: 'all'
+        },
+        {
+            label: <Text style={ {color: 'blue'} }>Акции</Text>,
+            value: 'shares'
+        },
+        {
+            label: <Text style={ {color: 'blue'} }>ETF</Text>,
+            value: 'etf'
+        },
+        {
+            label: <Text style={ {color: 'blue'} }>Об-ции</Text>,
+            value: 'bonds'
+        },
+        {
+            label: <Text style={ {color: 'blue'} }>Рубли</Text>,
+            value: 'cashe'
+        },
+    ];
+
+    const orderItems = [
+        {
+            label: <Icon name='arrow-down' color='blue' size = {18} />,
+            value: 'ASC'
+        },
+        {
+            label: <Icon name='arrow-up' color='blue' size = {18} />,
+            value: 'DESC'
+        }
+    ];
+
     return (
         <ScrollView contentContainerStyle={ styles.container } >
             { !loading ? 
             <>
+            <View style={ styles.filterContainer }>
+                <RadioButton 
+                    items= { radioItems } 
+                    onSelected={(value) => {setFilter(value)}}
+                />
+            </View>
+
             <View style={ styles.sortedContainer }>
                 <View style={ styles.pickerContainer }>
                     <Picker 
@@ -168,17 +236,61 @@ const TradesScreen = (props) => {
                         <Picker.Item label='ПО ТИКЕРУ' value='secid' />
                     </Picker>
                 </View>
+                <View style={ styles.orderContainer }>
+                    <RadioButton 
+                        items={ orderItems }
+                        onSelected={ (value) => { setOrder(value) } }
+                    />
+                </View>
             </View>
 
             <View style={ styles.tableContainer }>
                 <MenuProvider>
                 { trades.map((trade) => {
-                    if (currentSelector !== trade[sorted]) {
-                        currentSelector = trade[sorted];
 
-                        return [renderHeader(currentSelector), renderRow(trade)];
+                    var output = [];
+                    var show = false;
+
+                    // filter records
+                    switch (filter) {
+                        case 'all' :
+                            show = true;
+                            break;
+                        case 'shares':
+                            if (trade.group === 'Акция' || trade.group === 'Депозитарная расписка') {
+                                show = true;
+                            };
+                            break;
+                        case 'etf':
+                            if (trade.group === 'ПИФ' || trade.group === 'ETF') {
+                                show = true;
+                            };
+                            break;
+                        case 'bonds':
+                            if (trade.group === 'Облигация') {
+                                show = true;
+                            }
+                            break;
+                        case 'cashe':
+                            if (trade.group === null) {
+                                show = true;
+                            };
+                            break;
+                        default:
+                            show = true;
+                            break;
                     };
-                    return renderRow(trade);
+
+                    if (currentSelector !== trade[sorted]) {
+
+                        currentSelector = trade[sorted];
+                        output.push(renderHeader(currentSelector));
+
+                    }
+
+                    if (show) output.push(renderRow(trade));
+
+                    return output;
                 }
                 )}
                 </MenuProvider>
@@ -199,10 +311,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
     },
+    filterContainer: {
+        width: '100%',
+        marginTop: 8,
+        marginBottom: 8,
+        padding: 10,
+        paddingBottom: 0,
+    },
     sortedContainer: {
         width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         padding: 10,
-        marginTop: 8,
+        paddingBottom: 0,
         marginBottom: 8,
     },
     picker: {
@@ -215,10 +337,13 @@ const styles = StyleSheet.create({
         ],
     },
     pickerContainer: {
-        width: 150,
+        width: 180,
         borderWidth: 2,
         borderColor: 'blue',
         borderRadius: 10,
+    },
+    orderContainer: {
+        width: 70,
     },
     tableContainer: {
         width: '100%',
