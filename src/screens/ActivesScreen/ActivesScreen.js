@@ -11,6 +11,12 @@ import { getRequest } from '../../helpers';
 import { PortfolioHeader } from '../../components';
 import { ExpandableTable as Table } from '../../components';
 
+const sortArray = (arr, key) => {
+    return arr.sort((a, b) => {
+        return b[key] - a[key];
+    });
+};
+
 const ActivesScreen = (props) => {
 
     const [portfolio, setPortfolio] = useState({});
@@ -39,9 +45,9 @@ const ActivesScreen = (props) => {
                 console.log(results.error);
             }
             setPortfolio(results.data.portfolio);
-            setShares(results.data.shares);
-            setEtf(results.data.etf);
-            setBonds(results.data.bonds);
+            setShares(sortArray(results.data.shares, 'profit'));
+            setEtf(sortArray(results.data.etf, 'profit'));
+            setBonds(sortArray(results.data.bonds, 'profit'));
             setHistory(results.data.history);
             setLoading(false);
         })
@@ -62,13 +68,27 @@ const ActivesScreen = (props) => {
         return (
             <Table>
                 {actives.map(item => (
-                    <Table.Row>
-                        <Table.Cell textColor={getColor(item.changePrc)}>
-                            { item.SHORTNAME + ' (' + item.changePrc + ' %)' }
+                    <Table.Row key={ item.secid }>
+                        <Table.Cell>
+                            <Text style={{ color: getColor(item.changePrc) }}>
+                                { item.SHORTNAME + ' (' + item.changePrc + ' %)' }
+                            </Text>
                         </Table.Cell>
-                        <Table.Cell numeric>{ Number(item.last).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric textColor={getColor(item.profit)}>{ Number(item.profit).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric>{ Number(item.percentage).toFixed(2) }</Table.Cell>
+                        <Table.Cell numeric>
+                            <Text>
+                                { Number(item.last).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
+                        <Table.Cell numeric textColor={getColor(item.profit)}>
+                            <Text  style={{ color: getColor(item.changePrc) }}>
+                                { Number(item.profit).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
+                        <Table.Cell numeric>
+                            <Text>
+                                { Number(item.percentage).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
                     </Table.Row>
                 ))}
             </Table>
@@ -99,33 +119,45 @@ const ActivesScreen = (props) => {
 
                     { (portfolio.shares && portfolio.shares.cost > 0) && (
                     <Table.Row expandable data={ activesTable(shares) } style={{backgroundColor: '#f6f6f6'}}>
-                        <Table.Cell>Акции</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.shares.cost).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric textColor={getColor(portfolio.shares.profit)}>{ Number(portfolio.shares.profit).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.shares.percentage).toFixed(2) }</Table.Cell>
+                        <Table.Cell><Text>Акции</Text></Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.shares.cost).toFixed(2) }</Text></Table.Cell>
+                        <Table.Cell numeric>
+                            <Text style={{ color: getColor(portfolio.shares.profit) }}>
+                                { Number(portfolio.shares.profit).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.shares.percentage).toFixed(2) }</Text></Table.Cell>
                     </Table.Row>
                     )}
                     { (portfolio.etf && portfolio.etf.cost > 0) && (
                     <Table.Row expandable data={ activesTable(etf) } style={{backgroundColor: '#f6f6f6'}}>
-                        <Table.Cell>ETF/ПИФ</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.etf.cost).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric textColor={getColor(portfolio.etf.profit)}>{ Number(portfolio.etf.profit).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.etf.percentage).toFixed(2) }</Table.Cell>
+                        <Table.Cell><Text>ETF/ПИФ</Text></Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.etf.cost).toFixed(2) }</Text></Table.Cell>
+                        <Table.Cell numeric>
+                            <Text style={{ color: getColor(portfolio.etf.profit) }}>
+                                { Number(portfolio.etf.profit).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.etf.percentage).toFixed(2) }</Text></Table.Cell>
                     </Table.Row>
                     ) }
                     { (portfolio.bonds && portfolio.bonds.cost > 0) && (
                     <Table.Row expandable data={ activesTable(bands) } style={{backgroundColor: '#f6f6f6'}}>
-                        <Table.Cell>Облигации</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.bonds.cost).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric textColor={getColor(portfolio.bonds.profit)}>{ Number(portfolio.bonds.profit).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.bonds.percentage).toFixed(2) }</Table.Cell>
+                        <Table.Cell><Text>Облигации</Text></Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.bonds.cost).toFixed(2) }</Text></Table.Cell>
+                        <Table.Cell numeric>
+                            <Text style={{ color: getColor(portfolio.bonds.profit) }}>
+                                { Number(portfolio.bonds.profit).toFixed(2) }
+                            </Text>
+                        </Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.bonds.percentage).toFixed(2) }</Text></Table.Cell>
                     </Table.Row>
                     ) }
                     <Table.Row style={{backgroundColor: '#f6f6f6'}}>
-                        <Table.Cell>Рубли</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.cashe).toFixed(2) }</Table.Cell>
-                        <Table.Cell numeric>-</Table.Cell>
-                        <Table.Cell numeric>{ Number(portfolio.cashePercentage).toFixed(2) }</Table.Cell>
+                        <Table.Cell><Text>Рубли</Text></Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.cashe).toFixed(2) }</Text></Table.Cell>
+                        <Table.Cell numeric><Text>-</Text></Table.Cell>
+                        <Table.Cell numeric><Text>{ Number(portfolio.cashePercentage).toFixed(2) }</Text></Table.Cell>
                     </Table.Row>
 
                 </Table>

@@ -1,14 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-const ExpandableTableCell = ({ children, style, numeric, textColor }) => {
+const ExpandableTableCell = ({ children, style, numeric, text, textStyle }) => {
     return (
         <View style={[styles.container, numeric && styles.right, style]} >
-            { typeof children === 'string' ? 
-                <Text style={{color: textColor}}>{ children }</Text>
-                :
-                ({ children })
-            }
+            { text ? <Text style={textStyle}>{text}</Text> : children }
         </View>
     );
 };
