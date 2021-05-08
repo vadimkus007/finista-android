@@ -42,7 +42,7 @@ const deviceStorage = {
             if (value !== null) {
                 return JSON.parse(value);
             } else {
-                return '';
+                return null;
             }
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
@@ -55,6 +55,10 @@ const deviceStorage = {
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
         }
+    },
+
+    loadItemPromise(key) {
+        return AsyncStorage.getItem(key).then(result => JSON.parse(result));
     }
 
 };

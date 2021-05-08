@@ -140,7 +140,6 @@ const PortfolioEditScreen = (props) => {
                             }
                         }}
                         onDateChange={ (date) => {setPortfolio({...portfolio, dateopen: date})} }
-                        useNativeDriver={true}
                     />
                 </View>
                 <View style={ styles.section }>

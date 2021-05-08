@@ -15,6 +15,8 @@ import { Menu, MenuProvider, MenuOptions, MenuOption, MenuTrigger } from 'react-
 
 import { RadioButton } from '../../components';
 
+import deviceStorage from '../../services/deviceStorage';
+
 
 const TradesScreen = (props) => {
 
@@ -26,14 +28,16 @@ const TradesScreen = (props) => {
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
-        let _portfolio = props.navigation.getParam('portfolio');
-        if (_portfolio) {
+        deviceStorage.loadItemPromise('portfolio')
+        .then(_portfolio => {
             setPortfolio(_portfolio);
             setLoading(true);
             _loadData(_portfolio.id);
-        } else {
+        })
+        .catch(err => {
+            console.log(err);
             props.navigation.navigate('Portfolios');
-        };
+        });
     }, []);
 
     useEffect(() => {
@@ -89,6 +93,7 @@ const TradesScreen = (props) => {
         switch (action) {
             case 'edit': 
                 console.log('Edit', value);
+                props.navigation.navigate('TradeEdit', {trade: trade});
                 break;
             case 'delete':
                 Alert.alert(
@@ -125,7 +130,7 @@ const TradesScreen = (props) => {
         };
 
         return (
-            <View style={ styles.row } key={trade.id}>
+            <View style={ styles.row } key={trade.id.toString()}>
                 <View style={ styles.cell }>
                     <Icon name={ getIconName(trade.group) } color={ buy.includes(trade.operationId) ? 'green' : 'red'  } size={36} />
                 </View>
@@ -168,7 +173,7 @@ const TradesScreen = (props) => {
             title = moment(new Date(title)).format('DD.MM.YYYY');
         }
         return (
-            <View style={ {...styles.row, marginVertical: 10} }>
+            <View style={ {...styles.row, marginVertical: 10} } key={title}>
                 <Text style={ styles.header }>{ title }</Text>
             </View>
         );

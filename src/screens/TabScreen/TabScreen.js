@@ -13,7 +13,7 @@ import { PortfoliosScreen } from '../../screens/PortfoliosScreen';
 import { CalendarScreen } from '../../screens/CalendarScreen';
 import { PortfolioEditScreen } from '../../screens/PortfolioEditScreen';
 
-import { PortfolioStack } from '../../screens/PortfolioStack';
+import { PortfolioStack } from '../../navigation/PortfolioStack';
 
 const SignoutScreen = () => {};
 

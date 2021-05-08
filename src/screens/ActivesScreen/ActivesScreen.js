@@ -11,6 +11,8 @@ import { getRequest } from '../../helpers';
 import { PortfolioHeader } from '../../components';
 import { ExpandableTable as Table } from '../../components';
 
+import deviceStorage from '../../services/deviceStorage';
+
 const sortArray = (arr, key) => {
     return arr.sort((a, b) => {
         return b[key] - a[key];
@@ -27,14 +29,18 @@ const ActivesScreen = (props) => {
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
-        let _portfolio = props.navigation.getParam('portfolio');
-        if (_portfolio) {
+        // let _portfolio = props.navigation.getParam('portfolio');
+        
+        deviceStorage.loadItemPromise('portfolio')
+        .then(_portfolio => {
             setPortfolio(_portfolio);
             setLoading(true);
             _loadData(_portfolio.id);
-        } else {
+        })
+        .catch(err => {
+            console.log(err);
             props.navigation.navigate('Portfolios');
-        };
+        });
     }, []);
 
     const _loadData = (portfolioId) => {
@@ -80,7 +86,7 @@ const ActivesScreen = (props) => {
                             </Text>
                         </Table.Cell>
                         <Table.Cell numeric textColor={getColor(item.profit)}>
-                            <Text  style={{ color: getColor(item.changePrc) }}>
+                            <Text  style={{ color: getColor(item.profit) }}>
                                 { Number(item.profit).toFixed(2) }
                             </Text>
                         </Table.Cell>
