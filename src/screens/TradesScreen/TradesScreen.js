@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
 
@@ -95,18 +95,42 @@ const TradesScreen = (props) => {
         setTrades(_trades);
     };
 
+    const handleDeleteTrade = (trade) => {
+        const endPoint = '/portfolio/trades/delete';
+        postRequest(endPoint, trade)
+        .then(result => {
+            if (result.message) {
+                console.log(result.message);
+                _loadData(portfolio.id);
+                return;
+            }
+            if (result.error) {
+                if (result.error.name === 'SequelizeValidationError') {
+                    result.error.errors.map(item => {
+                        console.log('VALIDATION ERROR: ', item.message);
+                    });
+                } else {
+                    console.log('SERVER ERROR: ', result.error);
+                }
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
     const handleMenuSelect = (value) => {
         const {action, trade} = value;
         switch (action) {
             case 'edit': 
-                props.navigation.navigate('TradeEdit', {trade: trade});
+                props.navigation.navigate('TradeEdit', {trade: trade, refresh: refreshData});
                 break;
             case 'delete':
                 Alert.alert(
                     'ВНИМАНИЕ',
                     'Вы действительно хотите удалить сделку?',
                     [
-                        {text: 'Да', onPress: () => {console.log('Delete')}},
+                        {text: 'Да', onPress: (value) => {handleDeleteTrade(value)}},
                         {text: 'Нет'}
                     ]
                 );
@@ -114,6 +138,10 @@ const TradesScreen = (props) => {
             default:
                 break;
         };
+    };
+
+    const refreshData = () => {
+        _loadData(portfolio.id);
     };
 
     const renderRow = (trade) => {
@@ -262,6 +290,11 @@ const TradesScreen = (props) => {
                         items={ orderItems }
                         onSelected={ (value) => { setOrder(value) } }
                     />
+                </View>
+                <View style={{}}>
+                    <TouchableOpacity onPress={ () => { props.navigation.navigate('TradeEdit') } } >
+                        <Icon name='plus-circle' color='blue' size={38} />
+                    </TouchableOpacity>
                 </View>
             </View>
 

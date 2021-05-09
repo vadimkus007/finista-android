@@ -86,6 +86,8 @@ const TradeEditScreen = (props) => {
     const [secidsServer, setSecidsServer] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
+    const [valid, setValid] = useState(false);
+
 
     const getSecids = () => {
         const endPoint = '/securities';
@@ -134,7 +136,67 @@ const TradeEditScreen = (props) => {
     };
 
     const handleSubmit = () => {
-        console.log('Submit form', trade);
+        postRequest('/portfolio/trades/save', trade)
+        .then(result => {
+            if (result.trade) {
+                console.log('Trade saved successfully');
+                props.navigation.state.params.refresh();
+                props.navigation.navigate('TradesList');
+                return;
+            }
+            if (result.message) {
+                console.log(result.message);
+                props.navigation.state.params.refresh();
+                props.navigation.navigate('TradesList');
+                return;
+            }
+            if (result.error) {
+                if (result.error.name == 'SequelizeValidationError') {
+                    result.error.errors.map(item => {
+                        console.log('VALIDATION ERROR: ',item.message);
+                    });
+                } else {
+                    console.log('SERVER ERROR', result.error);
+                }
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    };
+
+    const checkValid = () => {
+
+        const isNumber = (value) => {
+            return (String(Number(value)) === String(value)) ? true : false;
+        };
+
+        const isDate = (value) => {
+            return (new Date(value).toISOString().slice(0,10) === value) ? true : false;
+        };
+
+        const isEmpty = (value) => {
+            return (typeof value === 'undefined' || isNaN(value) || value === null || value === '') ? true : false;
+        };
+
+        const isPrice = (value) => {
+            return (String(Number(value).toFixed(2)) === String(value)) ? true : false;
+        };
+
+        let _valid = true;
+        if (!isEmpty(trade.secid)) {
+            _valid = false;
+        }
+        if (isDate(trade.date)) {
+            _valid = false;
+        }
+        if (!isNumber(trade.amount) || Number(trade.amount) < 1) {
+            _valid = false;
+        }
+        if (!isPrice(trade.price)) {
+            _valid = false;
+        }
+        setValid(_valid);
     };
 
     useEffect(() => {
@@ -168,13 +230,15 @@ const TradeEditScreen = (props) => {
         
     },[]);
         
-    
-
     useEffect(() => {
         if (secidsServer.length > 0) {
             setSecids(secidsServer[tradeType]);
         }
     },[tradeType]);
+
+    useEffect(() => {
+        checkValid();
+    }, [trade]);
 
 
 
@@ -340,9 +404,18 @@ const TradeEditScreen = (props) => {
                     style={ styles.input }
                 />
             </View>
+            { valid ?
             <View style={ styles.row }>
                 <Button onPress={ handleSubmit } >
                     Сохранить
+                </Button>
+            </View>
+            :
+            null
+            }
+            <View style={ styles.row }>
+                <Button onPress={ () => {props.navigation.navigate('TradesList')} } >
+                    Отменить
                 </Button>
             </View>
 
