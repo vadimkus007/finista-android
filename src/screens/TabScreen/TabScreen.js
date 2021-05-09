@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Ionicons, SimpleLineIcons, MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -122,9 +122,19 @@ export const TabScreen = createBottomTabNavigator({
                 <SimpleLineIcons name='logout' color={tintColor} size={20} />
             ),
             tabBarOnPress: ({ navigation }) => {
-                deviceStorage.deleteJWT();
-                deviceStorage.deleteJWT('user');
-                navigation.navigate('Auth');
+                Alert.alert(
+                    'ВНИМАНИЕ',
+                    'Вы действительно хотите выйти?',
+                    [
+                        {text: 'Да', onPress: () => {
+                            deviceStorage.deleteJWT();
+                            deviceStorage.deleteJWT('user');
+                            navigation.navigate('Auth');
+                        }},
+                        {text: 'Нет'}
+                    ]
+                );
+                
             },
         }
     },

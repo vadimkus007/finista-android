@@ -11,7 +11,14 @@ import { Loading } from '../../components/common';
 
 import { getRequest } from '../../helpers';
 
-import { Menu, MenuProvider, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+import { 
+    Menu, 
+    MenuProvider, 
+    MenuOptions, 
+    MenuOption, 
+    MenuTrigger, 
+    MenuContext,
+    renderers } from 'react-native-popup-menu';
 
 import { RadioButton } from '../../components';
 
@@ -92,7 +99,6 @@ const TradesScreen = (props) => {
         const {action, trade} = value;
         switch (action) {
             case 'edit': 
-                console.log('Edit', value);
                 props.navigation.navigate('TradeEdit', {trade: trade});
                 break;
             case 'delete':
@@ -153,7 +159,16 @@ const TradesScreen = (props) => {
                         <MenuTrigger>
                             <Icon name='dots-vertical' color='black' size={18} />
                         </MenuTrigger>
-                        <MenuOptions optionsContainerStyle={{ marginTop: -200, }}>
+                        <MenuOptions 
+                            custonStyles =  {{
+                                optionsContainer: {
+                                    marginTop: 200,
+
+                                }
+                            }}
+                            optionsContainerStyle={{ marginTop: -100 }}
+
+                        >
                             <MenuOption value={{action: 'edit', trade: trade}}>
                                 <Text>Редактировать</Text>
                             </MenuOption>
@@ -216,6 +231,7 @@ const TradesScreen = (props) => {
     ];
 
     return (
+        <MenuProvider>
         <ScrollView contentContainerStyle={ styles.container } >
             { !loading ? 
             <>
@@ -250,7 +266,7 @@ const TradesScreen = (props) => {
             </View>
 
             <View style={ styles.tableContainer }>
-                <MenuProvider>
+                
                 { trades.map((trade) => {
 
                     var output = [];
@@ -298,7 +314,7 @@ const TradesScreen = (props) => {
                     return output;
                 }
                 )}
-                </MenuProvider>
+
             </View>
             </>
             :
@@ -306,6 +322,7 @@ const TradesScreen = (props) => {
             }
             <StatusBar style="auto" />
         </ScrollView>
+        </MenuProvider>
     );
 
 };
