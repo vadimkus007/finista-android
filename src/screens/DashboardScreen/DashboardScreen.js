@@ -25,7 +25,7 @@ const DashboardScreen = (props) => {
         const endPoint = '/favorites';
         getRequest(endPoint)
         .then(results => {
-            if (results) {
+            if (typeof results === 'array') {
                 const sorted = results.favorites.sort((a, b) =>  a.lasttoprevprice - b.lasttoprefprice);
                 setFavorites(sorted);
             }

@@ -63,5 +63,6 @@ export const PortfolioStack = createMaterialTopTabNavigator({
             backgroundColor: 'blue'
         },
     },
+    lazy: true
 });
 

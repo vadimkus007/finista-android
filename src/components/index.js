@@ -6,3 +6,4 @@ export * from './PortfolioCard';
 export * from './PortfolioHeader';
 export * from './ExpandableTable';
 export * from './RadioButton';
+export * from './RadioButtonText';
