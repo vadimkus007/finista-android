@@ -24,6 +24,7 @@ import { RadioButton } from '../../components';
 
 import deviceStorage from '../../services/deviceStorage';
 
+import { showMessage } from 'react-native-flash-message';
 
 const TradesScreen = (props) => {
 
@@ -43,6 +44,7 @@ const TradesScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger' });
             props.navigation.navigate('Portfolios');
         });
     }, []);
@@ -57,12 +59,14 @@ const TradesScreen = (props) => {
         .then(results => {
             if (results.error) {
                 console.log(results.error);
+                showMessage({ message: 'ERROR', description: results.error, type: 'danger' });
             }
             setTrades(results.trades);
             setLoading(false);
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger' });
         });
     };
 
@@ -101,6 +105,7 @@ const TradesScreen = (props) => {
         .then(result => {
             if (result.message) {
                 console.log(result.message);
+                showMessage({ message: result.message, type: 'info' });
                 _loadData(portfolio.id);
                 return;
             }
@@ -108,14 +113,17 @@ const TradesScreen = (props) => {
                 if (result.error.name === 'SequelizeValidationError') {
                     result.error.errors.map(item => {
                         console.log('VALIDATION ERROR: ', item.message);
+                        showMessage({ message: 'VALIDATION ERROR', description: item.message, type: 'danger' });
                     });
                 } else {
                     console.log('SERVER ERROR: ', result.error);
+                    showMessage({ message: 'ERROR', description: result.error, type: 'danger' });
                 }
             }
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: err.message, type: 'danger' });
         })
     }
 

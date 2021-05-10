@@ -13,6 +13,8 @@ import { getRequest, postRequest } from '../../helpers';
 
 import deviceStorage from '../../services/deviceStorage';
 
+import { showMessage, hideMessage } from 'react-native-flash-message';
+
 const PortfoliosScreen = (props) => {
 
     const [loading, setLoading] = useState(false);
@@ -44,6 +46,7 @@ const PortfoliosScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger'});
         });
     };
 

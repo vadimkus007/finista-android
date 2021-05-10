@@ -14,6 +14,8 @@ import { Loading } from '../../components/common';
 
 import { DashboardCard } from '../../components';
 
+import { showMessage, hideMessage } from 'react-native-flash-message';
+
 const DashboardScreen = (props) => {
 
     const [favorites, setFavorites] = useState([]);
@@ -30,6 +32,7 @@ const DashboardScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({message: 'ERROR', description: err.message, type: 'danger'});
         });
     };
 

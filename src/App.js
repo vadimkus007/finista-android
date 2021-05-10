@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-// import { StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
@@ -14,6 +14,8 @@ import { AuthLoadingScreen } from './screens';
 import { Signin, Signup } from './components';
 import { TabScreen } from './screens';
 
+import FlashMessage from 'react-native-flash-message';
+
 // import deviceStorage from './services/deviceStorage';
 
 const AppStack = createStackNavigator({ 
@@ -26,7 +28,7 @@ const AppStack = createStackNavigator({
 });
 const AuthStack = createStackNavigator({ Signin: Signin, Signup: Signup });
 
-export default createAppContainer(
+const AppContainer = createAppContainer(
     createSwitchNavigator(
         {
             AuthLoading: AuthLoadingScreen,
@@ -38,3 +40,14 @@ export default createAppContainer(
         }
     )
 );
+
+const App = () => {
+    return (
+        <View style={{ flex: 1 }}>
+            <AppContainer />
+            <FlashMessage position="top" icon="auto" style={{ marginTop: 25 }}/>
+        </View>
+    );
+};
+
+export default App;

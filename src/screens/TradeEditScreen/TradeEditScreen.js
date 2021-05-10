@@ -12,6 +12,8 @@ import { Button } from '../../components/common';
 import deviceStorage from '../../services/deviceStorage';
 import { getRequest, postRequest } from '../../helpers';
 
+import { showMessage } from 'react-native-flash-message';
+
 const operationsItems = [
         [
             {
@@ -140,6 +142,7 @@ const TradeEditScreen = (props) => {
         .then(result => {
             if (result.trade) {
                 console.log('Trade saved successfully');
+                showMessage({ message: 'Trade saved successfully', type: 'success' });
                 props.navigation.state.params.refresh();
                 props.navigation.navigate('TradesList');
                 return;
@@ -154,14 +157,17 @@ const TradeEditScreen = (props) => {
                 if (result.error.name == 'SequelizeValidationError') {
                     result.error.errors.map(item => {
                         console.log('VALIDATION ERROR: ',item.message);
+                        showMessage({ message: 'VALIDATION ERROR', description: item.message, type: 'danger' });
                     });
                 } else {
                     console.log('SERVER ERROR', result.error);
+                    showMessage({ message: 'ERROR', description: result.error, type: 'danger' });
                 }
             }
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: err.message, type: 'ganger' });
         });
     };
 
@@ -226,6 +232,7 @@ const TradeEditScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: err.message, type: 'danger' });
         });
         
     },[]);

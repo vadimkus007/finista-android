@@ -13,6 +13,8 @@ import { ExpandableTable as Table } from '../../components';
 
 import deviceStorage from '../../services/deviceStorage';
 
+import { showMessage } from 'react-native-flash-message';
+
 const sortArray = (arr, key) => {
     return arr.sort((a, b) => {
         return b[key] - a[key];
@@ -39,6 +41,7 @@ const ActivesScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger' });
             props.navigation.navigate('Portfolios');
         });
     }, []);
@@ -59,6 +62,7 @@ const ActivesScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger' });
         });
     };
 

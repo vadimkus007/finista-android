@@ -22,6 +22,8 @@ import deviceStorage from '../../services/deviceStorage';
 
 import { postRequest } from '../../helpers';
 
+import { showMessage } from 'react-native-flash-message';
+
 const defaultPortfolio = {
     title: 'Default Portfolio',
     currency: 'RUB',
@@ -67,12 +69,14 @@ const PortfolioEditScreen = (props) => {
         .then(result => {
             if (result.portfolio) {
                 console.log('Portfolio saved', result.portfolio);
+                showMessage({ message: 'Portfolio saved', type: 'success' });
                 props.navigation.state.params.refresh();
                 props.navigation.navigate('Portfolios');
                 return;
             }
             if (result.message) {
                 console.log('Portfolio saved with message', result.message);
+                showMessage({ message: result.message, type: 'success' })
                 props.navigation.state.params.refresh();
                 props.navigation.navigate('Portfolios');
                 return;
@@ -80,6 +84,7 @@ const PortfolioEditScreen = (props) => {
         })
         .catch(err => {
             console.log(err);
+            showMessage({ message: 'ERROR', description: err.message, type: 'danger' });
         });
         // alert(JSON.stringify(portfolio, null, 2));
     };
