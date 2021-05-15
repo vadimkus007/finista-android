@@ -50,6 +50,7 @@ const ActivesScreen = (props) => {
         const endPoint = '/portfolio/' + portfolioId + '/actives';
         getRequest(endPoint)
         .then(results => {
+            // console.log(results.data);
             if (results.error) {
                 console.log(results.error);
             }
