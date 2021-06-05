@@ -300,7 +300,7 @@ const TradesScreen = (props) => {
                     />
                 </View>
                 <View style={{}}>
-                    <TouchableOpacity onPress={ () => { props.navigation.navigate('TradeEdit') } } >
+                    <TouchableOpacity onPress={ () => { props.navigation.navigate('TradeEdit', { refresh: refreshData }) } } >
                         <Icon name='plus-circle' color='blue' size={38} />
                     </TouchableOpacity>
                 </View>

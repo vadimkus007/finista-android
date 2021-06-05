@@ -47,7 +47,7 @@ const QuotesStack = createStackNavigator({
     Quotes: {
         screen: QuotesScreen,
         navigationOptions: ({ navigation }) => ({
-            title: 'Quotes'
+            title: 'Котировки'
         })
     }
 },{

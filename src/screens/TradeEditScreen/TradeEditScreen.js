@@ -178,7 +178,7 @@ const TradeEditScreen = (props) => {
         };
 
         const isDate = (value) => {
-            return (new Date(value).toISOString().slice(0,10) === value) ? true : false;
+            return (new Date(value).toISOString().slice(0,10) == value) ? true : false;
         };
 
         const isEmpty = (value) => {
@@ -186,14 +186,14 @@ const TradeEditScreen = (props) => {
         };
 
         const isPrice = (value) => {
-            return (String(Number(value).toFixed(2)) === String(value)) ? true : false;
+            return (String(Number(value)) === String(value)) ? true : false;
         };
 
         let _valid = true;
         if (!isEmpty(trade.secid)) {
             _valid = false;
         }
-        if (isDate(trade.date)) {
+        if (!isDate(trade.date)) {
             _valid = false;
         }
         if (!isNumber(trade.amount) || Number(trade.amount) < 1) {
@@ -246,6 +246,10 @@ const TradeEditScreen = (props) => {
     useEffect(() => {
         checkValid();
     }, [trade]);
+
+    useEffect(() => {
+        setTrade({...trade, portfolioId: portfolio.id})
+    },[portfolio]);
 
 
 

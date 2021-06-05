@@ -1,14 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { List } from 'react-native-paper';
 
-import { PieChart } from 'react-native-charts-wrapper';
+import { 
+    BarChart as Bar,
+    PieChart
+ } from 'react-native-chart-kit';
+
+import { 
+    BarChart, 
+    Grid,
+    YAxis,
+    XAxis 
+} from 'react-native-svg-charts'
+
+import { showMessage } from 'react-native-flash-message';
 
 import { Loading } from '../../components/common';
 
 import deviceStorage from '../../services/deviceStorage';
 import { getRequest } from '../../helpers';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+const barData = {
+  labels: ["January", "February", "March", "April", "May", "June"],
+  datasets: [
+    {
+      data: [-45, -20, 28, 80, 99, 43]
+    }
+  ]
+};
 
 const AnalyticsScreen = (props) => {
 
@@ -16,10 +40,115 @@ const AnalyticsScreen = (props) => {
     const [portfolio, setPortfolio] = useState({});
     const [expanded, setExpanded] = useState(true);
 
+    const [actives, setActives] = useState([]);
+    const [activeTypes, setActiveTypes] = useState([]);
+    const [shares, setShares] = useState([]);
+    const [etf, setEtf] = useState([]);
+    const [sectors, setSectors] = useState([]);
+    const [efficiency, setEfficiency] = useState({labels: [], datasets: [{data:[]}]});
+    const [barData, setBarData] = useState({label: [], data: []});
+
+    const getRandomColor = () => {
+
+        const rand = () => {return Math.floor(Math.random() * 255)};
+
+        return 'rgb('+String(rand())+','+String(rand())+','+String(rand())+',1)';
+    };
+
+    const getColor = (index) => {
+        const colorsLib = [
+            '#803E75', // Strong Purple
+            '#FF6800', // Vivid Orange
+            '#A6BDD7', // Very Light Blue
+            '#C10020', // Vivid Red
+            '#CEA262', // Grayish Yellow
+            '#817066', // Medium Gray
+
+            // The following don't work well for people with defective color vision
+            '#007D34', // Vivid Green
+            '#F6768E', // Strong Purplish Pink
+            '#00538A', // Strong Blue
+            '#FF7A5C', // Strong Yellowish Pink
+            '#53377A', // Strong Violet
+            '#FF8E00', // Vivid Orange Yellow
+            '#B32851', // Strong Purplish Red
+            '#F4C800', // Vivid Greenish Yellow
+            '#7F180D', // Strong Reddish Brown
+            '#93AA00', // Vivid Yellowish Green
+            '#593315', // Deep Yellowish Brown
+            '#F13A13', // Vivid Reddish Orange
+            '#232C16', // Dark Olive Green
+            '#FFB300', // Vivid Yellow
+        ];
+
+        let _index = index;
+        while (_index > colorsLib.length-1) {
+            _index = _index - colorsLib.length;
+        };
+        return colorsLib[_index];
+    };
+
+    const processData = (data) => {
+        var _data = data.sort((a,b) => {
+            return b.y - a.y;
+        });
+        let result = [];
+        _data.map((item, index) => {
+            let _item = item;
+            if (_item.label) {
+                _item.name = _item.name + ' ' + _item.label;
+            }
+            _item.color = getColor(index);
+            _item.legendFontColor = "#7F7F7F";
+            _item.legendFontSize = 15;
+            result.push(_item);
+        });
+        return result;
+    };
+
+    const processBarData = (data) => {
+        let results = {label: [], data: []};
+        data.map((item, index) => {
+            results.label.push(item[0]);
+            results.data.push(item[1]);
+        });
+        return results;
+    };
+
+    const processEfficiency = (data) => {
+        let labels = [];
+        let newData = [];
+        data.map((item) => {
+            labels.push(item[0]);
+            newData.push(item[1]);
+        });
+        let result = {
+            labels: labels,
+            datasets: [
+                {
+                    data: newData,
+                    withShadow: false,
+                    color: 'rgba(255, 0, 0, 1)',
+                }
+            ]
+        };
+        return result;
+    };
+    
     useEffect(() => {
         deviceStorage.loadItemPromise('portfolio')
         .then(_portfolio => {
             setPortfolio(_portfolio);
+            return getRequest(`/portfolio/${_portfolio.id}/analytics`);
+        })
+        .then(results => {
+            setActives(processData(results.actives));
+            setActiveTypes(processData(results.activeTypes));
+            setShares(processData(results.shares));
+            setEtf(processData(results.etf));
+            setSectors(processData(results.sectors));
+            // setEfficiency(processEfficiency(results.efficiency));
+            setBarData(processBarData(results.efficiency));
         })
         .catch(err => {
             console.log(err);
@@ -28,38 +157,36 @@ const AnalyticsScreen = (props) => {
         });
     }, []);
 
-    var legend = {
-        enabled: true,
-        textSize: 14,
-        form: 'CIRCLE',
-        position: 'RIGHT_OF_CHART',
-        fontFamily: 'monospace',
-        wordWrapEnabled: true
+    const chartConfig = {
+      backgroundGradientFrom: "#1E2923",
+      backgroundGradientFromOpacity: 0,
+      backgroundGradientTo: "#08130D",
+      backgroundGradientToOpacity: 0.5,
+      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+      strokeWidth: 2, // optional, default 3
+      barPercentage: 0.5,
+      useShadowColorFromDataset: false, // optional
     };
 
-    var data = {
-        dataSets: [
-            {
-                yValues: [40, 21, 15, 9, 15],
-                label: 'Pie dataset',
-                config: {
-                    sliceSpace: 5,
-                    selectionShift: 13
-                }
-            },
-
-        ],
-        xValues: ['Sandwiches', 'Salads', 'Soup', 'Beverages', 'Desserts'],
+    const barConfig = {
+        backgroundGradientFrom: "#FFF",
+        backgroundGradientFromOpacity: 1,
+        backgroundGradientTo: "#FFF",
+        backgroundGradientToOpacity: 1,
+        fillShadowGradient: "#FF493B",
+        fillShadowGradientOpacity: 1,
+        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        strokeWidth: 3, // optional, default 3
+        barPercentage: 0.3,
+        useShadowColorFromDataset: false // optional
     };
 
-    var description = {
-        text: 'This is Pie Chart description',
-        textSize: 15,
-        textColor: 'darkgrey',
-        fontFamily: 'monospace',
-        fontStyle: 2
-    };
+    /************************************************/
+    const fill = 'rgb(134, 65, 244)';
 
+    /************************************************/
+
+    
     return (
         <ScrollView contentContainerStyle={ styles.container } >
             { !loading ?
@@ -71,7 +198,15 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 1</Text>
+                        <PieChart 
+                            data={ actives }
+                            width={ windowWidth - 30 }
+                            height={200}
+                            chartConfig={ {...chartConfig} }
+                            accessor={'y'}
+                            backgroundColor={'transparent'}
+                            paddingLeft={'15'}
+                        />
                     </View>
                 </List.Accordion>
                 <List.Accordion
@@ -80,7 +215,15 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 2</Text>
+                        <PieChart 
+                            data={ activeTypes }
+                            width={ windowWidth - 30 }
+                            height={200}
+                            chartConfig={ chartConfig }
+                            accessor={'y'}
+                            backgroundColor={'transparent'}
+                            paddingLeft={'15'}
+                        />
                     </View>
                 </List.Accordion>
                 <List.Accordion
@@ -89,7 +232,15 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 2</Text>
+                        <PieChart 
+                            data={ shares }
+                            width={ windowWidth - 30 }
+                            height={200}
+                            chartConfig={ chartConfig }
+                            accessor={'y'}
+                            backgroundColor={'transparent'}
+                            paddingLeft={'15'}
+                        />
                     </View>
                 </List.Accordion>
                 <List.Accordion
@@ -98,7 +249,15 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 2</Text>
+                        <PieChart 
+                            data={ etf }
+                            width={ windowWidth - 30 }
+                            height={200}
+                            chartConfig={ chartConfig }
+                            accessor={'y'}
+                            backgroundColor={'transparent'}
+                            paddingLeft={'15'}
+                        />
                     </View>
                 </List.Accordion>
                 <List.Accordion
@@ -107,7 +266,15 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 2</Text>
+                        <PieChart 
+                            data={ sectors }
+                            width={ windowWidth - 30 }
+                            height={200}
+                            chartConfig={ chartConfig }
+                            accessor={'y'}
+                            backgroundColor={'transparent'}
+                            paddingLeft={'15'}
+                        />
                     </View>
                 </List.Accordion>
                 <List.Accordion
@@ -116,7 +283,42 @@ const AnalyticsScreen = (props) => {
                     titleStyle={ styles.accordionTitle }
                 >
                     <View style={ styles.row }>
-                        <Text>Section 2</Text>
+                        <View style={ { height: 200, flexDirection: 'row' } }>
+                            <YAxis 
+                                data={ barData.data }
+                                svg={{
+                                   fill: 'grey',
+                                   fontSize: 10,
+                                }}
+                                contentInset={ styles.contentInset }
+                            />
+
+                            <BarChart 
+                                style={{ flex: 1, marginLeft: 10 }}
+                                data={ barData.data }
+                                svg={ {fill} }
+                                contentInset={ styles.contentInset }
+                                horizontal={ false }
+                            >
+                            
+                                
+                                <Grid direction={ Grid.Direction.HORIZONTAL } />
+                            </BarChart>
+
+                        </View>
+                        <View style={{ flexDirection: 'row', height: 40 }}>
+                            <XAxis
+                                style={ { paddingVertical: 0, flex: 1, paddingLeft: 35, paddingRight: 5 } }
+                                data={ barData.label ? barData.label : [] }
+                                formatLabel={ (value, index) => barData.label[index] ? barData.label[index] : '' }
+                                svg={{
+                                   fill: 'grey',
+                                   fontSize: 10,
+                                   rotation: 90,
+                                   translateY: 15,
+                                }}
+                            />
+                        </View>
                     </View>
                 </List.Accordion>
             </List.Section>
@@ -149,6 +351,15 @@ const styles = StyleSheet.create({
   row: {
     paddingHorizontal: 16,
   },
+  chart: {
+    flex: 1,
+  },
+  contentInset: {
+    top: 20,
+    bottom: 10,
+  },
 });
+
+
 
 export { AnalyticsScreen };
