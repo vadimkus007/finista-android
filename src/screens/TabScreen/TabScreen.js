@@ -12,8 +12,10 @@ import { QuotesScreen } from '../../screens/QuotesScreen';
 import { PortfoliosScreen } from '../../screens/PortfoliosScreen';
 import { CalendarScreen } from '../../screens/CalendarScreen';
 import { PortfolioEditScreen } from '../../screens/PortfolioEditScreen';
+import { QuoteScreen } from '../../screens/QuoteScreen';
 
 import { PortfolioStack } from '../../navigation/PortfolioStack';
+// import { QuotesStack } from '../../navigation/QuotesStack';
 
 const SignoutScreen = () => {};
 
@@ -48,6 +50,12 @@ const QuotesStack = createStackNavigator({
         screen: QuotesScreen,
         navigationOptions: ({ navigation }) => ({
             title: 'Котировки'
+        })
+    },
+    QuoteView: {
+        screen: QuoteScreen,
+        navigationOptions: ({ navigation }) => ({
+            title: navigation.getParam('secid')
         })
     }
 },{

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -54,6 +54,8 @@ const QuotesScreen = (props) => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({});
 
+    const [filter, setFilter] = useState('');
+
     const _loadData = () => {
         const endPoint = '/quotes';
         getRequest(endPoint)
@@ -92,6 +94,10 @@ const QuotesScreen = (props) => {
         _loadData();
     }, []);
 
+    const handleSelectSecid = (secid) => {
+        props.navigation.navigate('QuoteView', {secid: secid});
+    };
+
 
     return (
         <ScrollView contentContainerStyle={ styles.container } >
@@ -103,13 +109,22 @@ const QuotesScreen = (props) => {
                 />
             </View>
 
+            <View style={ styles.filterContainer }>
+                <TextInput 
+                    placeholder='Тикер'
+                    style={ styles.filterStyle }
+                    onChangeText={ (filter) => { setFilter(filter.toUpperCase()) } }
+                />
+            </View>
+
             { !loading ? 
             <View style={ styles.body } >
 
                 {
                     data[table] ?
                         data[table].map((item) => (
-                            <View style={ styles.row } key={ item.SECID }>
+                            filter.length === 0 || filter === item.SECID.toUpperCase().slice(0, filter.length) ? 
+                            <TouchableOpacity style={ styles.row } key={ item.SECID } onPress={() => { handleSelectSecid(item.SECID) }}>
                                 <View style={ {...styles.cell, flex: 3} }>
                                     <View style={ { flexDirection: 'row', alignItems: 'baseline' } }>
                                         <Text style={ [styles.secid, { paddingRight: 8 }] }>{ item.SECID }</Text>
@@ -131,7 +146,9 @@ const QuotesScreen = (props) => {
                                         </Text>
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
+                            : null
+                            
                         ))
                     : 
                     <Text>Data not loaded</Text>
@@ -158,7 +175,7 @@ const styles = StyleSheet.create({
   toolbar: {
     width: '100%',
     marginTop: 8,
-    marginBottom: 8,
+    marginBottom: 0,
     padding: 10,
     paddingBottom: 0,
   },
@@ -205,7 +222,22 @@ const styles = StyleSheet.create({
     change: {
         fontSize: 14,
 
-    }
+    },
+    filterContainer: {
+        width: '100%',
+        marginTop: 0,
+        marginBottom: 8,
+        padding: 10,
+        paddingBottom: 0,
+    },
+    filterStyle: {
+        color: '#555',
+        borderWidth: 2,
+        borderRadius: 10,
+        borderColor: 'blue',
+        padding: 2,
+        paddingHorizontal: 10,
+    },
 });
 
 export { QuotesScreen };

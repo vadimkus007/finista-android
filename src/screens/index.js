@@ -13,3 +13,4 @@ export * from './TradesScreen';
 export * from './ProfitScreen';
 export * from './AnalyticsScreen';
 export * from './TradeEditScreen';
+export * from './QuoteScreen';
