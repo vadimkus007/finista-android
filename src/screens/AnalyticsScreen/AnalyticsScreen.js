@@ -45,8 +45,8 @@ const AnalyticsScreen = (props) => {
     const [shares, setShares] = useState([]);
     const [etf, setEtf] = useState([]);
     const [sectors, setSectors] = useState([]);
-    const [efficiency, setEfficiency] = useState({labels: [], datasets: [{data:[]}]});
-    const [barData, setBarData] = useState({label: [], data: []});
+    const [efficiency, setEfficiency] = useState([]);
+    const [barData, setBarData] = useState([{label: '', data: 0}]);
 
     const getRandomColor = () => {
 
@@ -107,11 +107,11 @@ const AnalyticsScreen = (props) => {
     };
 
     const processBarData = (data) => {
-        let results = {label: [], data: []};
+        let results = [];
         data.map((item, index) => {
-            results.label.push(item[0]);
-            results.data.push(item[1]);
+            results.push({label: item[0], data: item[1]});
         });
+        // console.log(results);
         return results;
     };
 
@@ -142,11 +142,13 @@ const AnalyticsScreen = (props) => {
             return getRequest(`/portfolio/${_portfolio.id}/analytics`);
         })
         .then(results => {
+            console.log('efficiency', results.efficiency);
             setActives(processData(results.actives));
             setActiveTypes(processData(results.activeTypes));
             setShares(processData(results.shares));
             setEtf(processData(results.etf));
             setSectors(processData(results.sectors));
+            setEfficiency(results.efficiency);
             // setEfficiency(processEfficiency(results.efficiency));
             setBarData(processBarData(results.efficiency));
         })
@@ -285,20 +287,23 @@ const AnalyticsScreen = (props) => {
                     <View style={ styles.row }>
                         <View style={ { height: 200, flexDirection: 'row' } }>
                             <YAxis 
-                                data={ barData.data }
+                                data={ efficiency }
                                 svg={{
-                                   fill: 'grey',
+                                   fill:'grey',
                                    fontSize: 10,
                                 }}
                                 contentInset={ styles.contentInset }
+                                yAccessor={ ({item}) => item[1] }
                             />
 
                             <BarChart 
                                 style={{ flex: 1, marginLeft: 10 }}
-                                data={ barData.data }
+                                data={ efficiency }
                                 svg={ {fill} }
                                 contentInset={ styles.contentInset }
                                 horizontal={ false }
+                                yAccessor={ ({item}) => item[1] }
+                                xAccessor={ ({item}) => item[0] }
                             >
                             
                                 
@@ -309,14 +314,15 @@ const AnalyticsScreen = (props) => {
                         <View style={{ flexDirection: 'row', height: 40 }}>
                             <XAxis
                                 style={ { paddingVertical: 0, flex: 1, paddingLeft: 35, paddingRight: 5 } }
-                                data={ barData.label ? barData.label : [] }
-                                formatLabel={ (value, index) => barData.label[index] ? barData.label[index] : '' }
+                                data={ efficiency }
+                                formatLabel={ (value, index) => efficiency[index][0] }
                                 svg={{
                                    fill: 'grey',
                                    fontSize: 10,
                                    rotation: 90,
                                    translateY: 15,
                                 }}
+                                xAcccessor={ ({item}) => item[0] }
                             />
                         </View>
                     </View>

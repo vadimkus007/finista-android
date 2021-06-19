@@ -7,3 +7,4 @@ export * from './PortfolioHeader';
 export * from './ExpandableTable';
 export * from './RadioButton';
 export * from './RadioButtonText';
+export * from './StockChart';

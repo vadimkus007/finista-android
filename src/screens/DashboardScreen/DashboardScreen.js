@@ -56,7 +56,11 @@ const DashboardScreen = (props) => {
             let b = 126 - degree * 84;
             return `rgb(${r},${g},${b})`;
         } 
-    }
+    };
+
+    const handlePress = (secid) => {
+        props.navigation.navigate('QuoteView', {secid: secid});
+    };
 
     return (
         
@@ -68,6 +72,7 @@ const DashboardScreen = (props) => {
                         <DashboardCard
                             data={ favorite }
                             color={ getColor(favorite) }
+                            onPress={ () => { handlePress(favorite.secid) } }
                         />
                     </View>
                 ))

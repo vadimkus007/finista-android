@@ -12,7 +12,7 @@ const ExpandableTableRow = ({ children, style, onPress, expandable, data }) => {
 
     return (
         <>
-        <TouchableOpacity style={ {...styles.row, ...style} } onPress={ toggleExpanded } >
+        <TouchableOpacity style={ {...styles.row, ...style} } onPress={ expandable ? toggleExpanded : onPress } >
             { expandable && (
                 <View style={ {position: 'absolute', } }>
                 <Icon name={ expanded ? ('triangle-down') : ('triangle-right') } color='gray' size={14} />

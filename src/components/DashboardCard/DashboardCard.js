@@ -3,8 +3,9 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 const DashboardCard = ({ data, color, onPress }) => {
     const { card, highlight, regularText } = styles;
+
     return (
-        <View style={{ ...card, backgroundColor: color }} >
+        <TouchableOpacity style={{ ...card, backgroundColor: color }} onPress={ onPress } >
             <View>
                 <Text style={ highlight } >
                     { data.shortname }
@@ -20,7 +21,7 @@ const DashboardCard = ({ data, color, onPress }) => {
                     { data.lasttoprevprice + ' %' }
                 </Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 

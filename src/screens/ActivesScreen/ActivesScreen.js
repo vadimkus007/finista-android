@@ -73,13 +73,17 @@ const ActivesScreen = (props) => {
         } else if (value < 0) {
             return 'red';
         }
-    }
+    };
+
+    const handleActivePress = (secid) => {
+        props.navigation.navigate('QuoteView', {secid: secid});
+    };
 
     const activesTable = (actives) => {
         return (
             <Table>
                 {actives.map(item => (
-                    <Table.Row key={ item.secid }>
+                    <Table.Row key={ item.secid } onPress={ () => {handleActivePress(item.secid)} }>
                         <Table.Cell>
                             <Text style={{ color: getColor(item.changePrc) }}>
                                 { item.SHORTNAME + ' (' + item.changePrc + ' %)' }
